@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.4.5</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>package com.example.demo;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+class DemoApplicationTests {
+
+	@Test
+	void contextLoads() {
+	}
+
+}
+
+package com.example.demo;package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+
+@SpringBootApplication
+public class DemoApplication {
+	public static void main(String[] args) {
+		SpringApplication.run(DemoApplication.class, args);
+	}
+}
+
+package com.example.demo;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+//@RequestMapping("path1") 这个path1 是url的第一层路径， 可能会有多个第一层路径
+@RequestMapping("/yanbin")
+public class DemoController {
+
+    @Autowired
+    private RedissonDemo redissonDemo;
+//@GetMapping("path2") 这个 path2 是url的第二层路径，路径1下面可能有多个路径2
+@GetMapping("/test")
+    public String test(String id){
+        redissonDemo.test(id);
+        return "test";
+    }
+    @GetMapping("/test2")
+    public String test2(String id){
+        redissonDemo.test(id);
+        return "test2";
+    }
+}
+
+package com.example.demo;
+
+import org.redisson.Redisson;
+import org.redisson.api.RedissonClient;
+import org.redisson.config.Config;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class RedissonConfig {
+//配置连接redis
+    @Bean
+    public RedissonClient redissonClient() {
+
+        Config config = new Config();
+
+        config.useSingleServer().setAddress("redis://127.0.0.1:6379").setPassword("123");
+
+        return Redisson.create(config);
+    }
+
+}
+
+package com.example.demo;
+
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.concurrent.TimeUnit;
+
+@Service
+public class RedissonDemo {
+
+    private static final String REDIS_CACHE_KEY = "ncs.id:";
+    @Autowired
+    private RedissonClient redissonClient;
+//加了synchronized是同步锁，整个test方法执行完，再执行其他的test
+//public synchronized void test(String id) {
+    public void test (String id){
+        System.out.println("id:" + id + "=======" + Thread.currentThread().getName() + " coming");
+
+        RLock lock = redissonClient.getLock(REDIS_CACHE_KEY + id);
+
+        try {
+            //设置lock超时时间 2 秒
+            lock.lock(2, TimeUnit.SECONDS);
+            //以下是业务逻辑
+            System.out.println("id:" + id + "=======" + Thread.currentThread().getName() + "is locked");
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            //释放锁
+            lock.unlock();
+            System.out.println("id:" + id + "=======" + Thread.currentThread().getName() + "is unlock");
+        }
+    }
+}
+
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+public class SpringRedisTest extends DemoApplicationTests {
+//注入RedissonDemo
+    @Autowired
+    private RedissonDemo redissonDemo;
+
+    @Test
+    public void test() throws InterruptedException {
+        //创建多个线程
+        ThreadTest test1 = new ThreadTest("1");
+        ThreadTest test2 = new ThreadTest("2");
+        ThreadTest test3 = new ThreadTest("3");
+        ThreadTest test4 = new ThreadTest("4");
+        //多线程并发
+        new Thread(test1,"thread 01").start();
+        new Thread(test2,"thread 02").start();
+        new Thread(test3,"thread 03").start();
+        new Thread(test4,"thread 04").start();
+    }
+
+    class ThreadTest extends Thread {
+
+        private String id;
+
+        ThreadTest(){
+
+        }
+
+        ThreadTest(String id) {
+            this.id = id;
+        }
+
+
+        @Override
+        public void run() {
+            redissonDemo.test(id);
+        }
+    }
+}
+
+	<groupId>testLock</groupId>
+	<artifactId>demo</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>demo</name>
+	<description>Demo project for Spring Boot</description>
+	<properties>
+		<java.version>1.8</java.version>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.redisson</groupId>
+			<artifactId>redisson</artifactId>
+			<version>3.11.5</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.redisson</groupId>
+			<artifactId>redisson-spring-boot-starter</artifactId>
+			<version>3.10.6</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+</project>
