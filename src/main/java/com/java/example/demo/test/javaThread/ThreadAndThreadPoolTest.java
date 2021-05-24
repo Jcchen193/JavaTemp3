@@ -14,9 +14,8 @@ import java.util.concurrent.locks.LockSupport;
 
 import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 
-public class CreateThreadTest  {
-
-	 
+public class ThreadAndThreadPoolTest  {
+ 
 	public static List<String> getThreadByThread() {
 		//1.继承Thread
 		List<String> threadList =new ArrayList<String>();
