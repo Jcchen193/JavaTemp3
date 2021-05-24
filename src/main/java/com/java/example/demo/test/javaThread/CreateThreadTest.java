@@ -2,13 +2,17 @@ package com.java.example.demo.test.javaThread;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.LockSupport;
+
+import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 
 public class CreateThreadTest  {
 
@@ -97,7 +101,6 @@ public class CreateThreadTest  {
 //		for (int i = 0; i < 10; i++) {
 //			Runnable r = new Runnable() {
 //
-//				 
 //				public void run() {
 //					System.out.println("我是创建线程池创建并发" + Thread.currentThread().getName() + ".");
 //					threadList.add("我是创建线程池创建并发" + Thread.currentThread().getName() + ".");
@@ -108,70 +111,71 @@ public class CreateThreadTest  {
 //		executorService.shutdown();
 		
 		//System.out.println("------------------------------");
-		//3.直接调用ThreadPoolExecutor的构造函数来创建线程池
-//		ExecutorService executor = new ThreadPoolExecutor(10, 10,
-//		        60L, TimeUnit.SECONDS,
-//		        new ArrayBlockingQueue(10));
-//		for (int i = 0; i < 10; i++) {
-//			Runnable r = new Runnable() {
-//				 
-//				public void run() {
-//					System.out.println("我是调用ThreadPoolExecutor的构造函数创建线程池" + Thread.currentThread().getName() + ".");
-//					threadList.add("我是调用ThreadPoolExecutor的构造函数创建线程池" + Thread.currentThread().getName() + ".");
-//				}
-//			};
-//			executor.execute(r);
-//		}
-//		executor.shutdown();
-		
 		return threadList;
 
 	}
 
-	 
-	public static List<String> getConcurrentMapTest() {
-		
+	public static List<String> getThreadPoolExecutorThread() {
 		List<String> threadList = new ArrayList<String>();
 		
-		ConcurrentHashMap<Object, Object> map = new ConcurrentHashMap<>();
-
-		map.put("k1", "v1");
-
-		map.put("k2", "v2");
-
-		map.put("k1", "v2");
-
-		map.putIfAbsent("k1", "vv1");
-
-		for(Map.Entry me : map.entrySet()) {
-			System.out.println("ConcurrentMap- key: " + me.getKey() + ",value: " + me.getValue());
-			threadList.add("ConcurrentMap -key: " + me.getKey() + ",value: " + me.getValue());
+		//35直接调用ThreadPoolExecutor的构造函数来创建线程池
+		ExecutorService executor = new ThreadPoolExecutor(10, 10,
+		        60L, TimeUnit.SECONDS,
+		        new ArrayBlockingQueue(10));
+		for (int i = 0; i < 10; i++) {
+			Runnable r = new Runnable() {
+				 
+				public void run() {
+					System.out.println("我是调用ThreadPoolExecutor的构造函数创建线程池" + Thread.currentThread().getName() + ".");
+					threadList.add("我是调用ThreadPoolExecutor的构造函数创建线程池" + Thread.currentThread().getName() + ".");
+				}
+			};
+			executor.execute(r);
 		}
+		executor.shutdown();
 		
 		return threadList;
-
-		}
-
-	 
-	public static List<String> getCopyOnWriteTest() {
+		
+	}
+	
+	public static List<String> getScheduledRhreadPoolExecutorThread() throws InterruptedException, ExecutionException{
 		List<String> threadList = new ArrayList<String>();
-		CopyOnWriteArrayList copylist = new CopyOnWriteArrayList<>();
+		ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(5);
+		 System.out.println("start: " + System.currentTimeMillis());
 
-		copylist.add("1");
+	         //1执行一个无返回值任务，5秒后执行，只执行一次
+	        scheduledThreadPoolExecutor.schedule(() -> {
+	            System.out.println("spring: " + System.currentTimeMillis());
+	        }, 5, TimeUnit.SECONDS);
 
-		copylist.add("2");
+	        //2执行一个有返回值任务，5秒后执行，只执行一次
+	        ScheduledFuture<String> future = scheduledThreadPoolExecutor.schedule(() -> {
+	            System.out.println("inner summer: " + System.currentTimeMillis());
+	            return "outer summer: ";
+	        }, 5, TimeUnit.SECONDS);
+	        //3 获取返回值
+	        System.out.println(future.get() + System.currentTimeMillis());
 
-		for(int i=0;i<copylist.size();i++) {
-			System.out.println(copylist.get(i));
-			threadList.add("copyOnWrite:" + copylist.get(i));
-			
-		}
+	        //4 按固定频率执行一个任务，每2秒执行一次，1秒后执行
+	        //5 任务开始时的2秒后
+	        scheduledThreadPoolExecutor.scheduleAtFixedRate(() -> {
+	            System.out.println("autumn: " + System.currentTimeMillis());
+	            LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(1));
+	        }, 1, 2, TimeUnit.SECONDS); //scheduleAtFixedRate:处理和未来任务一样，只是会装饰成另外一个任务再去执行
 
+	        //6 按固定延时执行一个任务，每延时2秒执行一次，1秒执行
+	        //7 任务结束时的2秒后
+	        scheduledThreadPoolExecutor.scheduleWithFixedDelay(() -> {
+	            System.out.println("winter: " + System.currentTimeMillis());
+	            LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(1));
+	        }, 1, 2, TimeUnit.SECONDS); 
+		
 		return threadList;
 	}
 	
-	public static void main(String[] args) {
-	     //getThreadByThread();
-		getCopyOnWriteTest();
+	
+	public static void main(String[] args) throws InterruptedException, ExecutionException {
+	    // getThreadByThread();
+		getScheduledRhreadPoolExecutorThread();
 	}
 }
