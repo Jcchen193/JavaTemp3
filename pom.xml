@@ -32,6 +32,22 @@
 			<scope>test</scope>
 		</dependency>
 
+        <!--CaoXing:单元测试 -->
+       <dependency>
+       		<groupId>junit</groupId>
+     		 <artifactId>junit</artifactId>
+      		<version>4.12</version>
+    		 <!--  <scope>test</scope> -->
+       </dependency>
+       
+        <!-- CaoXing:Netty -->
+       <dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-all</artifactId>
+			<version>4.1.11.Final</version>
+	    </dependency>
+
+	
 		<!-- <dependency>
 			<groupId>org.redisson</groupId>
 			<artifactId>redisson</artifactId>
