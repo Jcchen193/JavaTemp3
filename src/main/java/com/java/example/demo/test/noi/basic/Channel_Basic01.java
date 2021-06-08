@@ -1,4 +1,4 @@
-﻿package com.java.example.demo.test.noi;
+﻿package com.java.example.demo.test.noi.basic;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -12,16 +12,23 @@ import java.nio.file.StandardOpenOption;
 
 import org.junit.Test;
 
-public class Test003_Channel {
+public class Channel_Basic01 {
 
+	
+	/**
+	 * 1.利用通道完成文件的copy(非直接存储) 
+	 * 2.使用直接存储完成文件的复制(内存映射)
+	 * 3.通道和通道之间传输复制文件(直接存储)
+	 * @throws IOException
+	 */
 
     @Test
     //1.利用通道完成文件的copy(非直接存储) 
     public void Test001() throws IOException { 
     	long start=System.currentTimeMillis();
     	
-        FileInputStream in=new FileInputStream("src/main/resources/static/images/1.png");  
-        FileOutputStream out=new FileOutputStream("src/main/resources/static/images/2.png");
+        FileInputStream in=new FileInputStream("src/main/resource/1.png");  
+        FileOutputStream out=new FileOutputStream("src/main/resource/2.png");
 
         //获取通道
         FileChannel inChannel=in.getChannel();
@@ -52,8 +59,8 @@ public class Test003_Channel {
 
     	long start=System.currentTimeMillis();
         //获取通道Open()
-        FileChannel inChannel=FileChannel.open(Paths.get("src/main/resources/static/images/1.PNG"), StandardOpenOption.READ);
-        FileChannel outChannel=FileChannel.open(Paths.get("src/main/resources/static/images/3.PNG"), StandardOpenOption.WRITE,StandardOpenOption.CREATE);
+        FileChannel inChannel=FileChannel.open(Paths.get("src/main/resource/1.PNG"), StandardOpenOption.READ);
+        FileChannel outChannel=FileChannel.open(Paths.get("src/main/resource/2.PNG"), StandardOpenOption.WRITE,StandardOpenOption.CREATE);
 
         //内存映射文件
         MappedByteBuffer inMapBuffer=inChannel.map(MapMode.READ_ONLY,0, inChannel.size());
@@ -76,14 +83,14 @@ public class Test003_Channel {
     
     
     @Test
-    //3.通道和通道之间传输复制文件（直接存储
+    //3.通道和通道之间传输复制文件(直接存储)
     public void Test003() throws IOException{
         
     long start=System.currentTimeMillis();
 
     //获取通道Open()
-    FileChannel inChannel=FileChannel.open(Paths.get("src/main/resources/static/images/1.PNG"), StandardOpenOption.READ);
-    FileChannel outChannel=FileChannel.open(Paths.get("src/main/resources/static/images/4.PNG"), StandardOpenOption.WRITE,StandardOpenOption.CREATE);
+    FileChannel inChannel=FileChannel.open(Paths.get("src/main/resource/1.PNG"), StandardOpenOption.READ);
+    FileChannel outChannel=FileChannel.open(Paths.get("src/main/resource/4.PNG"), StandardOpenOption.WRITE,StandardOpenOption.CREATE);
 
     //通道之间获取用TransferFrom or transferto
     //inChannel.transferTo(0, inChannel.size(), outChannel);

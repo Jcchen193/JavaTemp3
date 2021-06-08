@@ -1,5 +1,4 @@
-﻿package com.java.example.demo.test.noi;
-
+﻿package com.java.example.demo.test.noi.basic;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -13,7 +12,7 @@ import org.junit.Test;
  * 数据会被写到sink中，从Source通道读取。
  *
  */
-public class Test005_Pipe {
+public class Channel_Pipe03 {
 	
 	@Test
 	public void Pipe() throws IOException {
