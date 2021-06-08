@@ -97,6 +97,8 @@ public class TestNonBlockingGroupServer {
 			
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}finally {
+			 //发生异常处理....
 		}
 		
 	}
@@ -114,7 +116,7 @@ public class TestNonBlockingGroupServer {
 			ByteBuffer buf=ByteBuffer.allocate(1024);
 			
 			while(ssChannel.read(buf)>0) {
-				buf.flip();
+				//buf.flip();
 				
 				String msg=new String(buf.array());
 				System.out.println(" from 客户端( "+ssChannel.getRemoteAddress()+"):" +msg);
@@ -122,7 +124,7 @@ public class TestNonBlockingGroupServer {
 				
 				//向其他客户端发送消息，排除自己
 				SendClientMessage(msg,ssChannel);
-				buf.clear();
+				//buf.clear();
 			}
 					
 			
@@ -145,14 +147,14 @@ public class TestNonBlockingGroupServer {
 	
 	
 	//向其他客户端发送消息，排除自己
-	public void SendClientMessage(String msg,SocketChannel self) {
+	public void SendClientMessage(String msg,SocketChannel self) throws IOException {
 		
 		/**
 		 * 1.遍历所有注册到Selector上的SocketChannel -->selector.keys()
 		 * 2.写入到通道中传给客户端
 		 */
-           try {
-				System.out.println("服务器端转发消息.....");
+       
+			System.out.println("服务器端转发消息.....");
 						
 				for(SelectionKey key: selector.keys()) {
 				Channel tagetChannel=key.channel();
@@ -165,10 +167,7 @@ public class TestNonBlockingGroupServer {
 			 }
 		}
 
-	} catch (IOException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
+	
 }
 	
 	public static void main(String[] args) {

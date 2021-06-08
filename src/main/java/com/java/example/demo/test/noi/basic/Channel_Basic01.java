@@ -27,8 +27,8 @@ public class Channel_Basic01 {
     public void Test001() throws IOException { 
     	long start=System.currentTimeMillis();
     	
-        FileInputStream in=new FileInputStream("src/main/resources/1.png");  
-        FileOutputStream out=new FileOutputStream("src/main/resources/2.png");
+        FileInputStream in=new FileInputStream("src/main/static/1.png");  
+        FileOutputStream out=new FileOutputStream("src/main/static/2.png");
 
         //获取通道
         FileChannel inChannel=in.getChannel();
@@ -59,8 +59,8 @@ public class Channel_Basic01 {
 
     	long start=System.currentTimeMillis();
         //获取通道Open()
-        FileChannel inChannel=FileChannel.open(Paths.get("src/main/resources/1.PNG"), StandardOpenOption.READ);
-        FileChannel outChannel=FileChannel.open(Paths.get("src/main/resources/2.PNG"), StandardOpenOption.WRITE,StandardOpenOption.CREATE);
+        FileChannel inChannel=FileChannel.open(Paths.get("src/main/static/1.PNG"), StandardOpenOption.READ);
+        FileChannel outChannel=FileChannel.open(Paths.get("src/main/static/2.PNG"), StandardOpenOption.WRITE,StandardOpenOption.CREATE);
 
         //内存映射文件
         MappedByteBuffer inMapBuffer=inChannel.map(MapMode.READ_ONLY,0, inChannel.size());
@@ -89,8 +89,8 @@ public class Channel_Basic01 {
     long start=System.currentTimeMillis();
 
     //获取通道Open()
-    FileChannel inChannel=FileChannel.open(Paths.get("src/main/resources/1.PNG"), StandardOpenOption.READ);
-    FileChannel outChannel=FileChannel.open(Paths.get("src/main/resources/4.PNG"), StandardOpenOption.WRITE,StandardOpenOption.CREATE);
+    FileChannel inChannel=FileChannel.open(Paths.get("src/main/static/1.PNG"), StandardOpenOption.READ);
+    FileChannel outChannel=FileChannel.open(Paths.get("src/main/static/4.PNG"), StandardOpenOption.WRITE,StandardOpenOption.CREATE);
 
     //通道之间获取用TransferFrom or transferto
     //inChannel.transferTo(0, inChannel.size(), outChannel);

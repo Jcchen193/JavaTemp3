@@ -87,10 +87,13 @@ public class TestNonBlockingGroupClient {
 						
 						
 					}
-				it.remove();
-				}
 				
+				it.remove();//删除当前的selectionKey, 防止重复操作
 			}
+		}else {
+			//System.out.println("没有可以用的通道...");
+		}
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -101,7 +104,7 @@ public class TestNonBlockingGroupClient {
 	 public static void main(String[] args) throws IOException{
 		 
 		 //启动客户端
-		 final TestNonBlockingGroupClient TestNonBlockingGroupClient=new TestNonBlockingGroupClient();//？？
+		TestNonBlockingGroupClient TestNonBlockingGroupClient=new TestNonBlockingGroupClient();//
 		 
 		 //启动一个线程,每3s读取从服务器端发送到客户端的数
 		 new Thread() {
