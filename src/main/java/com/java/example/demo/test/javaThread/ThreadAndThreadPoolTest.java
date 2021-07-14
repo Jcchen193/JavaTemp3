@@ -175,6 +175,7 @@ public class ThreadAndThreadPoolTest  {
 	
 	public static void main(String[] args) throws InterruptedException, ExecutionException {
 	    // getThreadByThread();
-		getScheduledRhreadPoolExecutorThread();
+		getMultipleThreadByThread();
+		//getScheduledRhreadPoolExecutorThread();
 	}
 }
